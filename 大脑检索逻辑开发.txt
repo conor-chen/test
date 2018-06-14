@@ -1,0 +1,111 @@
+图片：地址信息，时间信息，任务（目的）信息，场景信息，环境信息，人物信息，人脸识别。
+
+
+
+
+
+create or replace procedure refreshmv( mvname in varchar2 ) is
+begin
+        DBMS_MVIEW.REFRESH(mvname, 'FORCE');
+EXCEPTION
+when others then
+   DBMS_MVIEW.REFRESH(mvname, 'C');
+END refreshmv;
+/
+begin
+FOR  p_cur in ( SELECT OWNER,
+                        NAME,
+                        MVIEW_SITE,
+                        MVIEW_ID
+                   FROM USER_REGISTERED_MVIEWS  
+                  WHERE MVIEW_SITE = 'HTARGET'  )
+loop
+ DBMS_OUTPUT.PUT_LINE(p_cur.name);
+ refreshmv ( p_cur.name);
+end loop;
+end;
+
+
+
+
+BEGIN
+dbms_mview.refresh('biz_sopo_changetime','C');
+END;
+
+
+快速刷新是一种比完全刷新快的多的刷新方式，快速刷新只刷新自上次刷新以来修改的数据，因为快速刷新所要操作的数据量少，使用这种方法能大大的节省带宽.
+快速刷新要求在基表上面有MView Log，接着上面给出的例子，我们来给MVT做一个快速刷新。
+-- 现在表T上面创建MView Log
+-- 如果没有建立MView Log的话要进行快速刷新的话会报错的
+
+create materialized view log on 基表;
+
+-- 接下来就是进行快速刷新了
+exec dbms_mview.refresh('mvname', 'F');
+
+USER_MVIEW_LOGS 描述当前用户拥有的所有物化视图日志。
+
+
+
+陈康，
+    请写两以下两个报表，不需前台。pl/sql即可。
+一次可查询出每个MV LOG的数据量，以确定该MV是否有异常。
+SELECT * FROM user_mview_logs  查出所有的MV LOG。
+select count(1) from log_table  log_table为上一步中查出的table名称。 select count(1) from MLOG$_BIZ_SAP_PO1
+每个工厂运行的MV情况，若出问题时，可直接运行你所写的语句查明。请参考http://blog.itpub.net/12974804/viewspace-1062043/
+
+
+
+******************
+SELECT * FROM user_mview_logs  查出所有的MV LOG
+
+
+
+
+
+要确定相关的物化视图有没有进行快速刷新，如果没有刷新，这些日志表中的数据会一直增长下去，占据表空间
+
+1.查看所有物化视图日志的信息
+SELECT * FROM user_mview_logs；
+
+2.（首先查看有多少物化视图注册到了刷新机制中）
+select OWNER,NAME,MVIEW_SITE,MVIEW_ID from DBA_REGISTERED_MVIEWS;
+
+3.(查看基表上的物化视图刷新依赖,近期进行刷新的物化视图，与上面的表做对比，以确定哪些物化视图没有进行刷新)
+
+ SELECT * FROM DBA_BASE_TABLE_MVIEWS;
+
+
+4.对于没有刷新的视图，调用存储函数refreshmv进行刷新。
+
+create or replace procedure refreshmv( mvname in varchar2 ) is
+begin
+        DBMS_MVIEW.REFRESH('mvname', 'FORCE');
+EXCEPTION
+when others then
+   DBMS_MVIEW.REFRESH('mvname', 'C');
+END refreshmv;
+
+/
+
+5.调用循环，使所有MV刷新一遍
+begin
+FOR  p_cur in ( SELECT OWNER,
+                        NAME,
+                        MVIEW_SITE,
+                        MVIEW_ID
+                   FROM USER_REGISTERED_MVIEWS  
+                  WHERE MVIEW_SITE = 'Target'  )
+loop
+ DBMS_OUTPUT.PUT_LINE(p_cur.name);
+ refreshmv ( p_cur.name);
+
+end loop;
+end;
+
+6.根据刷新情况清空物化视图日志
+EXEC DBMS_MVIEW.PURGE_MVIEW_FROM_LOG(p_cur.mview_id);
+
+
+
+

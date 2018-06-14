@@ -1,0 +1,23 @@
+http://www.ruanyifeng.com/blog/2011/08/bayesian_inference_part_two.html
+
+https://www.zhihu.com/question/19725590
+
+http://www.jianshu.com/p/283154606af5
+
+https://www.zhihu.com/lives/795264798257479680知乎算法学习
+
+https://www.zhihu.com/question/22553761知乎神经网络介绍
+
+http://blog.csdn.net/viewcode/article/details/8794401逻辑回归
+
+http://open.163.com/special/Khan/khstatistics.html统计学公开课
+
+http://www.cnblogs.com/subconscious/p/5058741.html神经网络解读
+
+https://studygolang.com/articles/2810 Python、Java、Scala、Go Package对照表
+
+http://www.cnblogs.com/xiaofeng1234/p/5987845.html统计学基础知识
+
+http://www.linuxprobe.com/chapter-08.html  《Linux就该这么学》学习网
+
+https://www.zhihu.com/remix/albums/921103406666493952?extra_auto_play=1知乎经济学  斯坦福大学课程
